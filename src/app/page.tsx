@@ -139,9 +139,11 @@ export default function SnakeGame() {
 
   // Game loop
   useEffect(() => {
-    if (!isPlaying || gameOverRef.current || isPausedRef.current) return;
+    if (!isPlaying || gameOverRef.current) return;
 
     const moveSnake = () => {
+      if (isPausedRef.current) return; // Early return if paused
+      
       setSnake(prevSnake => {
         const head = { ...prevSnake[0] };
         
@@ -201,14 +203,9 @@ export default function SnakeGame() {
 
     const gameInterval = setInterval(moveSnake, speed);
     return () => clearInterval(gameInterval);
-  }, [isPlaying, food, generateFood, speed]);
+  }, [isPlaying, gameOverRef, speed, food, generateFood]); // Remove isPausedRef to prevent interval reset
 
-  // Generate initial food
-  useEffect(() => {
-    if (snake.length > 0) {
-      setFood(generateFood());
-    }
-  }, [snake, generateFood]);
+
 
   // Render game cell
   const renderCell = (x: number, y: number) => {
